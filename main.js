@@ -71,6 +71,17 @@ exportslambdaHandler = function(event, context){
   event.result.forEach( function(message, index){
     console.log(JSON.stringify(message));
     var mid = message.content.from;
+    switch(message.content.contentType){
+      case 1:   // Text Message
+        sendTextTo(mid, '画像を送ってね');
+        break;
+      case 2:   // Image Message
+        sendTextTo(mid, 'ちょっとまってね');
+      default:  // Other Messages
+        sendTextTo(mid, '画像を送ってね');
+        break;
+    }
+    
     sendTextTo(mid, '受信したよ');
   });
 };
