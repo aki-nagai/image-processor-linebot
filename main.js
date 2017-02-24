@@ -76,6 +76,38 @@ function sendTextTo(mid, text){
     req.end();
 }
 
+// Func: Send image to user
+function sendImageTo(mid, originalUrl, previewUrl){
+    var options = {
+          hostname: endpointHost,
+          path:     '/v1/events',
+          headers:  headers,
+          method:   'POST'
+        };
+    var req = https.request(options, function(res){
+          res.on('data', function(chunk){
+                }).on('error', function(err){
+                  console.log(err);
+                }).on('end', function(){            //call when no more date in response
+                  console.log('finish sending image');
+                });
+        });
+    var body = JSON.stringify({
+          to:        [mid],
+          toChannel: 1383378250,            //Fixed value
+          eventType: "138311608800106203",  //Fiexd value
+          content: {
+                  contentType: 2,     //Fiexed value if send image
+                  toType:      2,     //Fiexed value if send image
+                  originalContentUrl: originalUrl,
+                  previewImageUrl:    previewUrl
+                }
+        });
+
+    req.write(body);
+    req.end();
+}
+
 // Func: Save image to s3
 function saveImageToS3(img, name, callback){
   var params = {
