@@ -9,6 +9,31 @@ var headers      = {
   'X-Line-Trusted-User-With-ACL': 'u5b8d5cd3e8f9baf9d7efe0692de87e75' //Fixed value
 }
 
+// Func: Retrieve image from mesasge using its content id
+function retriveImageFrom(contentId, callback){
+  var options = {
+    hostname: endpointHost,
+    path:     '/v1/bot/message/' + contentId + '/content',
+    headers:  headers,
+    method:   'GET'
+  };
+  var req = https.request(options, function(res){
+    var data = [];
+    res.on('data', function(chunk){
+      //image data dividing it in to multiple request
+      data.push(new Buffer(chunk));
+    }).on('error', function(err){
+      console.log(err);
+    }).on('end', function(){
+      console.log('finish to retrive image')
+      img = Buffer.concat(data);
+      callback(null, img);
+    });
+  });
+
+  req.end();
+}
+
 // Func: Send text to user
 function sendTextTo(mid, text){
     var options = {
