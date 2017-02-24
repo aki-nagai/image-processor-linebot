@@ -77,6 +77,9 @@ exportslambdaHandler = function(event, context){
         break;
       case 2:   // Image Message
         sendTextTo(mid, 'ちょっとまってね');
+        retriveImageFrom(message.content.id, function(err, img) {
+          console.log(img)
+        });
       default:  // Other Messages
         sendTextTo(mid, '画像を送ってね');
         break;
