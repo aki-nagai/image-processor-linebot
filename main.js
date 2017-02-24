@@ -1,5 +1,6 @@
 var https = require('https');                              // HTTPS
 var gm    = require('gm').subClass({ imageMagick: true }); // Image processing
+var aws   = require('aws-sdk');                            //AWS SDK
 
 /* LINE API Settings */
 var endpointHost = 'trialbot-api.line.me';  // End Point(Fixed value)
@@ -9,6 +10,14 @@ var headers      = {
   'X-Line-ChannelSecret':         process.env.CHANNEL_SECRET,         //Your channel secret
   'X-Line-Trusted-User-With-ACL': 'u5b8d5cd3e8f9baf9d7efe0692de87e75' //Fixed value
 }
+
+/* AWS SDK Settings */
+var s3     = new aws.S3({ apiVersion: '2006-03-01',     //Fixed value
+                          region:     'ap-northeast-1'  //Your region
+});
+var bucket = process.env.BUCKET_NAME;                   //Your bucket name
+var s3Url  = 'https://s3-ap-northeast-1.amazonaws.com/' + bucket + '/';
+
 
 // Func: Retrieve image from mesasge using its content id
 function retriveImageFrom(contentId, callback){
@@ -66,6 +75,23 @@ function sendTextTo(mid, text){
     req.end();
 }
 
+// Func: Save image to s3
+function saveImageToS3(img, name, callback){
+  var params = {
+    Bucket: bucket,
+    Key:    name,              // File name
+    ACL:    'public-read',
+    Body:   img                // Image buffer
+  };
+  s3.putObject(params, function(err, data){
+    if(err){
+      callback("e", "");
+    } else {
+      callback(null, s3Url + name);
+    }
+  });
+}
+
 // Func: Process the image
 function processImage(img, callback) {
   // process the image to printmaking style using gm module
@@ -93,14 +119,14 @@ exportslambdaHandler = function(event, context){
         sendTextTo(mid, 'ちょっとまってね');
         retriveImageFrom(message.content.id, function(err, img) {
           processImage(img, function(err, buf) {
-            console.log(buf);
+            saveImageToS3(buf, mid + extension, function(err, result){
+              console.log(result);
+            });
           });
         });
       default:  // Other Messages
         sendTextTo(mid, '画像を送ってね');
         break;
     }
-    
-    sendTextTo(mid, '受信したよ');
   });
 };
