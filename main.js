@@ -19,6 +19,9 @@ var s3     = new aws.S3({ apiVersion: '2006-03-01',     //Fixed value
 var bucket = process.env.BUCKET_NAME;                   //Your bucket name
 var s3Url  = 'https://s3-ap-northeast-1.amazonaws.com/' + bucket + '/';
 
+/* Other Settings */
+var extension = '.jpg'; //Image extention
+
 
 // Func: Retrieve image from mesasge using its content id
 function retriveImageFrom(contentId, callback){
@@ -178,6 +181,8 @@ exportslambdaHandler = function(event, context){
             });
           },
           function(originalUrl, previewUrl, callback){
+            //send converted image
+            sendImageTo(mid, originalUrl, previewUrl);
           }
         ], function(err, result){
           if(err){
