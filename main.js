@@ -119,7 +119,9 @@ exportslambdaHandler = function(event, context){
         sendTextTo(mid, 'ちょっとまってね');
         retriveImageFrom(message.content.id, function(err, img) {
           processImage(img, function(err, buf) {
-            console.log(buf);
+            saveImageToS3(buf, mid + extension, function(err, result){
+              console.log(result);
+            });
           });
         });
       default:  // Other Messages
