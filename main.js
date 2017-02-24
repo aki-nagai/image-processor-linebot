@@ -75,6 +75,23 @@ function sendTextTo(mid, text){
     req.end();
 }
 
+// Func: Save image to s3
+function saveImageToS3(img, name, callback){
+  var params = {
+    Bucket: bucket,
+    Key:    name,              // File name
+    ACL:    'public-read',
+    Body:   img                // Image buffer
+  };
+  s3.putObject(params, function(err, data){
+    if(err){
+      callback("e", "");
+    } else {
+      callback(null, s3Url + name);
+    }
+  });
+}
+
 // Func: Process the image
 function processImage(img, callback) {
   // process the image to printmaking style using gm module
