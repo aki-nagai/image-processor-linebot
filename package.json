@@ -15,6 +15,7 @@
   },
   "homepage": "https://github.com/aki-nagai/image-processor-linebot#readme",
   "dependencies": {
+    "async": "^2.1.5",
     "gm": "^1.23.0"
   }
 }
