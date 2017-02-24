@@ -1,6 +1,7 @@
 var https = require('https');                              // HTTPS
+var async = require('async');                              // Syncronize
 var gm    = require('gm').subClass({ imageMagick: true }); // Image processing
-var aws   = require('aws-sdk');                            //AWS SDK
+var aws   = require('aws-sdk');                            // AWS SDK
 
 /* LINE API Settings */
 var endpointHost = 'trialbot-api.line.me';  // End Point(Fixed value)
@@ -117,13 +118,22 @@ exportslambdaHandler = function(event, context){
         break;
       case 2:   // Image Message
         sendTextTo(mid, 'ちょっとまってね');
-        retriveImageFrom(message.content.id, function(err, img) {
-          processImage(img, function(err, buf) {
-            saveImageToS3(buf, mid + extension, function(err, result){
-              console.log(result);
-            });
-          });
+        async.waterfall([
+          function(callback){
+            retriveImageFrom(message.content.id, callback);
+          },
+          function(img, callback){
+            processImage(img, callback);
+          },
+          function(img, callback){
+            saveImageToS3(img, mid + extension, callback);
+          }
+        ], function(err, result){
+          if(err){
+            console.log(err);
+          }
         });
+        break;  
       default:  // Other Messages
         sendTextTo(mid, '画像を送ってね');
         break;
