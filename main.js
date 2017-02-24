@@ -19,6 +19,9 @@ var s3     = new aws.S3({ apiVersion: '2006-03-01',     //Fixed value
 var bucket = process.env.BUCKET_NAME;                   //Your bucket name
 var s3Url  = 'https://s3-ap-northeast-1.amazonaws.com/' + bucket + '/';
 
+/* Other Settings */
+var extension = '.jpg'; //Image extention
+
 
 // Func: Retrieve image from mesasge using its content id
 function retriveImageFrom(contentId, callback){
@@ -69,6 +72,38 @@ function sendTextTo(mid, text){
                   contentType: 1,       //Fixed value if send text
                   toType:      1,       //Fiexd value if send text
                   text:        text
+                }
+        });
+
+    req.write(body);
+    req.end();
+}
+
+// Func: Send image to user
+function sendImageTo(mid, originalUrl, previewUrl){
+    var options = {
+          hostname: endpointHost,
+          path:     '/v1/events',
+          headers:  headers,
+          method:   'POST'
+        };
+    var req = https.request(options, function(res){
+          res.on('data', function(chunk){
+                }).on('error', function(err){
+                  console.log(err);
+                }).on('end', function(){            //call when no more date in response
+                  console.log('finish sending image');
+                });
+        });
+    var body = JSON.stringify({
+          to:        [mid],
+          toChannel: 1383378250,            //Fixed value
+          eventType: "138311608800106203",  //Fiexd value
+          content: {
+                  contentType: 2,     //Fiexed value if send image
+                  toType:      2,     //Fiexed value if send image
+                  originalContentUrl: originalUrl,
+                  previewImageUrl:    previewUrl
                 }
         });
 
@@ -146,6 +181,8 @@ exportslambdaHandler = function(event, context){
             });
           },
           function(originalUrl, previewUrl, callback){
+            //send converted image
+            sendImageTo(mid, originalUrl, previewUrl);
           }
         ], function(err, result){
           if(err){
