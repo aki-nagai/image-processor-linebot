@@ -126,7 +126,26 @@ exportslambdaHandler = function(event, context){
             processImage(img, callback);
           },
           function(img, callback){
-            saveImageToS3(img, mid + extension, callback);
+            async.parallel({
+              original: function(callback){
+                saveImageToS3(img, mid + extension, callback);
+              },
+              preview: function(callback){
+                gm(img).resize(240).toBuffer('jpg',function(err,buf){
+                  saveImageToS3(buf, mid + '_thumbnail' + extension, callback);
+                });
+              }
+            }, function(err, result){
+              if(err){
+                console.log(err);
+              } else {
+                callback(null,
+                         result.original,
+                         result.preview);
+              }
+            });
+          },
+          function(originalUrl, previewUrl, callback){
           }
         ], function(err, result){
           if(err){
