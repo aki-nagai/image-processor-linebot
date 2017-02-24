@@ -40,9 +40,12 @@ function sendTextTo(mid, text){
     req.end();
 }
 
+// Lambda Handler
 exportslambdaHandler = function(event, context){
   // Retrieve each message. max:100
   event.result.forEach( function(message, index){
     console.log(JSON.stringify(message));
+    var mid = message.content.from;
+    sendTextTo(mid, '受信したよ');
   });
 };
