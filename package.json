@@ -1,0 +1,20 @@
+{
+  "name": "linebot",
+  "version": "1.0.0",
+  "description": "AWS Lambdaを使ったサーバレス画像加工LINEBOT。 ユーザがこのBOTに画像を送信すると版画風に加工処理された画像を返信する。 ※ 現在はLINE BOT APIのトライアル版終了に伴って公開中止。",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aki-nagai/image-processor-linebot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aki-nagai/image-processor-linebot/issues"
+  },
+  "homepage": "https://github.com/aki-nagai/image-processor-linebot#readme",
+  "dependencies": {
+    "gm": "^1.23.0"
+  }
+}

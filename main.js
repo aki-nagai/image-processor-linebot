@@ -1,4 +1,5 @@
-var https = require('https');   
+var https = require('https');                              // HTTPS
+var gm    = require('gm').subClass({ imageMagick: true }); // Image processing
 
 /* LINE API Settings */
 var endpointHost = 'trialbot-api.line.me';  // End Point(Fixed value)
@@ -65,6 +66,19 @@ function sendTextTo(mid, text){
     req.end();
 }
 
+// Func: Process the image
+function processImage(img, callback) {
+  // process the image to printmaking style using gm module
+  // 1: grayscale : modulate(100, 0)
+  // 2: edge detection : edge(7)
+  gm(img).modulate(100,0).edge(7).toBuffer('jpg',function(err, buf){
+      if(err){
+        console.log(err);
+      }
+      callback(null, buf);
+  });
+}
+
 // Lambda Handler
 exportslambdaHandler = function(event, context){
   // Retrieve each message. max:100
@@ -78,7 +92,9 @@ exportslambdaHandler = function(event, context){
       case 2:   // Image Message
         sendTextTo(mid, 'ちょっとまってね');
         retriveImageFrom(message.content.id, function(err, img) {
-          console.log(img)
+          processImage(img, function(err, buf) {
+            console.log(buf);
+          });
         });
       default:  // Other Messages
         sendTextTo(mid, '画像を送ってね');
